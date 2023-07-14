@@ -5,12 +5,10 @@ import { redirect } from 'next/navigation'
 
 import prismadb from '@/lib/prismadb'
 
-export default async function DashboardLayout({
+export default async function SetupLayout({
   children,
-  params,
 }: {
   children: ReactNode
-  params: { storeId: string }
 }) {
   const { userId } = auth()
 
@@ -20,19 +18,13 @@ export default async function DashboardLayout({
 
   const store = await prismadb.store.findFirst({
     where: {
-      id: params.storeId,
       userId,
     },
   })
 
-  if (!store) {
-    redirect('/')
+  if (store) {
+    redirect(`/${store.id}`)
   }
 
-  return (
-    <div>
-      <header>This will be the navbar from {store.name}</header>
-      {children}
-    </div>
-  )
+  return <>{children}</>
 }
