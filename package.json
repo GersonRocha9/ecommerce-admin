@@ -11,6 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^4.21.15",
     "@hookform/resolvers": "^3.1.1",
+    "@prisma/client": "^5.0.0",
     "@radix-ui/react-dialog": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
     "@radix-ui/react-slot": "^1.0.2",
@@ -36,6 +37,7 @@
     "zustand": "^4.3.9"
   },
   "devDependencies": {
-    "eslint-plugin-simple-import-sort": "^10.0.0"
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "prisma": "^5.0.0"
   }
 }
