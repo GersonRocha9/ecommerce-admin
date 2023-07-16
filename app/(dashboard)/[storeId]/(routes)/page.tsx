@@ -14,7 +14,7 @@ const DashboardPage: React.FC<DashboardPageProps> = async ({ params }) => {
   })
 
   return (
-    <div>
+    <div className="p-4">
       <p>Store ID: {params.storeId}</p>
 
       <p>Store Name: {store?.name}</p>

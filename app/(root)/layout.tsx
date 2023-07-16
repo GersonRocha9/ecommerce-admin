@@ -22,6 +22,12 @@ export default async function SetupLayout({
     },
   })
 
+  // const billboard = await prismadb.billboard.findFirst({
+  //   where: {
+  //     userId,
+  //   },
+  // })
+
   if (store) {
     redirect(`/${store.id}`)
   }
