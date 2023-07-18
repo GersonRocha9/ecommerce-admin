@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Billboard } from '@prisma/client'
+import { Color } from '@prisma/client'
 import axios from 'axios'
 import { Trash } from 'lucide-react'
 import { useParams, useRouter } from 'next/navigation'
@@ -22,58 +22,57 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Heading } from '@/components/ui/heading'
-import ImageUpload from '@/components/ui/image-upload'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 
 const formSchema = z.object({
-  label: z.string().nonempty(),
-  imageUrl: z.string().nonempty(),
+  name: z.string().nonempty(),
+  value: z.string().min(4).regex(/^#/, {
+    message: 'Must be a valid hex color.',
+  }),
 })
 
-type BillboardFormValues = z.infer<typeof formSchema>
+type ColorFormValues = z.infer<typeof formSchema>
 
-interface BillboardFormProps {
-  initialData: Billboard | null
+interface ColorFormProps {
+  initialData: Color | null
 }
 
-export const BillboardForm: React.FC<BillboardFormProps> = ({
-  initialData,
-}) => {
+export const ColorForm: React.FC<ColorFormProps> = ({ initialData }) => {
   const params = useParams()
   const router = useRouter()
 
-  const title = initialData ? 'Edit Billboard' : 'New Billboard'
-  const description = initialData ? 'Edit a Billboard' : 'Add a new billboard'
-  const toastMessage = initialData ? 'Billboard updated.' : 'Billboard created.'
-  const action = initialData ? 'Save changes' : 'Create billboard'
+  const title = initialData ? 'Edit Color' : 'New Color'
+  const description = initialData ? 'Edit a Color' : 'Add a new color'
+  const toastMessage = initialData ? 'Color updated.' : 'Color created.'
+  const action = initialData ? 'Save changes' : 'Create color'
 
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const form = useForm<BillboardFormValues>({
+  const form = useForm<ColorFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: '',
-      imageUrl: '',
+      name: '',
+      value: '',
     },
   })
 
-  const onSubmit = async (values: BillboardFormValues) => {
+  const onSubmit = async (values: ColorFormValues) => {
     try {
       setIsLoading(true)
 
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/${params.storeId}/colors/${params.colorId}`,
           values,
         )
       } else {
-        await axios.post(`/api/${params.storeId}/billboards`, values)
+        await axios.post(`/api/${params.storeId}/colors`, values)
       }
 
       router.refresh()
-      router.push(`/${params.storeId}/billboards`)
+      router.push(`/${params.storeId}/colors`)
       toast.success(toastMessage)
     } catch (error) {
       toast.error('Something went wrong.')
@@ -86,14 +85,12 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
     try {
       setIsLoading(true)
 
-      await axios.delete(
-        `/api/${params.storeId}/billboards/${params.billboardId}`,
-      )
+      await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`)
       router.refresh()
-      router.push(`/${params.storeId}/billboards`)
-      toast.success('Billboard deleted.')
+      router.push(`/${params.storeId}/colors`)
+      toast.success('Color deleted.')
     } catch (error) {
-      toast.error('Make sure you removed all categories from this billboard.')
+      toast.error('Make sure you removed all products with this color.')
     } finally {
       setIsLoading(false)
       setIsOpen(false)
@@ -117,7 +114,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         {initialData && (
           <Button
             variant="destructive"
-            size="icon"
+            color="icon"
             onClick={() => {
               setIsOpen(true)
             }}
@@ -135,39 +132,48 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Background image</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={isLoading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange('')}
-                  />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
-              name="label"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isLoading}
-                      placeholder="Billboard label"
+                      placeholder="Color name"
                     />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Value</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-x-4">
+                      <Input
+                        {...field}
+                        disabled={isLoading}
+                        placeholder="Color value"
+                      />
+
+                      <div
+                        className="p-4 rounded-full border"
+                        style={{
+                          backgroundColor: field.value,
+                          borderColor: field.value,
+                        }}
+                      />
+                    </div>
                   </FormControl>
 
                   <FormMessage />

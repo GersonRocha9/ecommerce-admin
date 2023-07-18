@@ -10,18 +10,18 @@ export async function POST(
   try {
     const { userId } = auth()
     const body = await req.json()
-    const { label, imageUrl } = body
+    const { name, billboardId } = body
 
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    if (!label) {
-      return new NextResponse('Missing label', { status: 400 })
+    if (!name) {
+      return new NextResponse('Missing name', { status: 400 })
     }
 
-    if (!imageUrl) {
-      return new NextResponse('Missing imageUrl', { status: 400 })
+    if (!billboardId) {
+      return new NextResponse('Missing billboardId', { status: 400 })
     }
 
     if (!params.storeId) {
@@ -39,22 +39,22 @@ export async function POST(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const billboard = await prismadb.billboard.create({
+    const category = await prismadb.category.create({
       data: {
-        label,
-        imageUrl,
+        name,
+        billboardId,
         storeId: params.storeId,
       },
     })
 
-    return new NextResponse(JSON.stringify(billboard), {
+    return new NextResponse(JSON.stringify(category), {
       status: 201,
       headers: {
         'Content-Type': 'application/json',
       },
     })
   } catch (error) {
-    console.log('[BILLBOARDS_POST]', error)
+    console.log('[CATEGORIES_POST]', error)
 
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -69,20 +69,20 @@ export async function GET(
       return new NextResponse('Missing storeId', { status: 400 })
     }
 
-    const billboards = await prismadb.billboard.findMany({
+    const categories = await prismadb.category.findMany({
       where: {
         storeId: params.storeId,
       },
     })
 
-    return new NextResponse(JSON.stringify(billboards), {
+    return new NextResponse(JSON.stringify(categories), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
       },
     })
   } catch (error) {
-    console.log('[BILLBOARDS_GET]', error)
+    console.log('[CATEGORIES_GET]', error)
 
     return new NextResponse('Internal Server Error', { status: 500 })
   }

@@ -10,17 +10,17 @@ export async function POST(
   try {
     const { userId } = auth()
     const body = await req.json()
-    const { label, imageUrl } = body
+    const { name, value } = body
 
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    if (!label) {
-      return new NextResponse('Missing label', { status: 400 })
+    if (!name) {
+      return new NextResponse('Missing name', { status: 400 })
     }
 
-    if (!imageUrl) {
+    if (!value) {
       return new NextResponse('Missing imageUrl', { status: 400 })
     }
 
@@ -39,22 +39,22 @@ export async function POST(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const billboard = await prismadb.billboard.create({
+    const color = await prismadb.color.create({
       data: {
-        label,
-        imageUrl,
+        name,
+        value,
         storeId: params.storeId,
       },
     })
 
-    return new NextResponse(JSON.stringify(billboard), {
+    return new NextResponse(JSON.stringify(color), {
       status: 201,
       headers: {
         'Content-Type': 'application/json',
       },
     })
   } catch (error) {
-    console.log('[BILLBOARDS_POST]', error)
+    console.log('[COLOR_POST]', error)
 
     return new NextResponse('Internal Server Error', { status: 500 })
   }
@@ -69,20 +69,20 @@ export async function GET(
       return new NextResponse('Missing storeId', { status: 400 })
     }
 
-    const billboards = await prismadb.billboard.findMany({
+    const colors = await prismadb.color.findMany({
       where: {
         storeId: params.storeId,
       },
     })
 
-    return new NextResponse(JSON.stringify(billboards), {
+    return new NextResponse(JSON.stringify(colors), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
       },
     })
   } catch (error) {
-    console.log('[BILLBOARDS_GET]', error)
+    console.log('[COLORS_GET]', error)
 
     return new NextResponse('Internal Server Error', { status: 500 })
   }
